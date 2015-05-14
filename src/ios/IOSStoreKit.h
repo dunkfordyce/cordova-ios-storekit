@@ -5,7 +5,7 @@
 #import "Base64.h"
 
 
-@interface SubscriptionManager : CDVPlugin <SKPaymentTransactionObserver, SKRequestDelegate>
+@interface IOSStoreKit : CDVPlugin <SKPaymentTransactionObserver, SKRequestDelegate>
 {
     NSSet* productIdentifier;
     SKProduct* subscription;
@@ -50,20 +50,20 @@
 
 
 @interface ProductsRequestDelegate : NSObject <SKProductsRequestDelegate> {
-    SubscriptionManager* plugin;
+    IOSStoreKit* plugin;
     CDVInvokedUrlCommand* command;
 }
-@property (retain) SubscriptionManager* plugin;
+@property (retain) IOSStoreKit* plugin;
 @property (retain) CDVInvokedUrlCommand* command;
 @end
 
 
 
 @interface ProductsRefreshDelegate : NSObject <SKRequestDelegate> {
-    SubscriptionManager* plugin;
+    IOSStoreKit* plugin;
     CDVInvokedUrlCommand* command;
 }
-@property (retain) SubscriptionManager* plugin;
+@property (retain) IOSStoreKit* plugin;
 @property (retain) CDVInvokedUrlCommand* command;
 @end
  

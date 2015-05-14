@@ -26,7 +26,7 @@
         <!-- Cordova 2.5+ -->
         <config-file target="config.xml" parent="/*">
             <feature name="iosstorekit">
-                <param name="ios-package" value="iosstorekit"/>
+                <param name="ios-package" value="IOSStoreKit"/>
                 <param name="onload" value="true" />
             </feature>
         </config-file>
@@ -34,7 +34,7 @@
         <header-file src="src/ios/Base64.h" />
         <source-file src="src/ios/Base64.m" />
         <header-file src="src/ios/IOSStoreKit.h" />
-        <header-file src="src/ios/IOSStoreKit.m" />
+        <source-file src="src/ios/IOSStoreKit.m" />
         <framework src="StoreKit.framework" />
     </platform>
 </plugin>

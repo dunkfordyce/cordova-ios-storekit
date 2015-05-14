@@ -1,4 +1,4 @@
-#import "SubscriptionManager.h"
+#import "IOSStoreKit.h"
 
 #define NILABLE(obj) ((obj) != nil ? (NSObject *)(obj) : (NSObject *)[NSNull null])
 
@@ -76,9 +76,9 @@
 }
 @end
 
-@implementation SubscriptionManager
+@implementation IOSStoreKit
 
-static SubscriptionManager * _scManager; 
+static IOSStoreKit * _scManager;
 
 @synthesize request = _request;
 @synthesize subscription = _subscription;
