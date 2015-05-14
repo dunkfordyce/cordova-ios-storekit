@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin
+    xmlns="http://apache.org/cordova/ns/plugins/1.0"
+    id="uk.co.fatdrop.ios.storekit"
+    version="0.0.1">
+
+    <name>ios-storekit</name>
+	<description></description>
+    <engines>
+        <engine name="cordova" version=">=2.4.0" />
+    </engines>
+
+	<license>MIT</license>
+    <keywords>cordova,purchase,storekit,ios</keywords>
+
+    <platform name="ios">
+        <!--
+        <js-module src="www/store-ios.js" name="InAppPurchase">
+            <clobbers target="store" />
+        </js-module>
+        -->
+
+        <!-- Cordova 2.2 -->
+        <plugins-plist key="iosstorekit" string="iosstorekit" />
+
+        <!-- Cordova 2.5+ -->
+        <config-file target="config.xml" parent="/*">
+            <feature name="iosstorekit">
+                <param name="ios-package" value="iosstorekit"/>
+                <param name="onload" value="true" />
+            </feature>
+        </config-file>
+
+        <header-file src="src/ios/Base64.h" />
+        <source-file src="src/ios/Base64.m" />
+        <header-file src="src/ios/IOSStoreKit.h" />
+        <header-file src="src/ios/IOSStoreKit.m" />
+        <framework src="StoreKit.framework" />
+    </platform>
+</plugin>
