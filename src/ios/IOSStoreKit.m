@@ -104,30 +104,33 @@ static IOSStoreKit * _scManager;
 {
     NSLog(@"init()");
     
-    [self.commandDelegate evalJs:@"window.kuyashop = {}"];
-    
-    [self export:@"payment_states" object:[[NSDictionary alloc] initWithObjectsAndKeys:
-                                           @(SKPaymentTransactionStatePurchasing), @"purchasing",
-                                           @(SKPaymentTransactionStatePurchased), @"purchased",
-                                           @(SKPaymentTransactionStateFailed), @"failed",
-                                           @(SKPaymentTransactionStateRestored), @"restored",
-                                           @(SKPaymentTransactionStateDeferred), @"deferred",
-                                           nil
-                                           ]];
-    
-    [self export:@"errors" object:[[NSDictionary alloc] initWithObjectsAndKeys:
-                                   @(SKErrorClientInvalid), @"client_invalid",
-                                   @(SKErrorPaymentCancelled), @"payment_cancelled",
-                                   @(SKErrorPaymentInvalid), @"payment_invalid",
-                                   @(SKErrorPaymentNotAllowed), @"payment_not_allowed",
-                                   @(SKErrorStoreProductNotAvailable), @"store_product_not_available",
-                                   nil
-                                   ]];
-
-    
-    [[SKPaymentQueue defaultQueue] addTransactionObserver:self];
-    
-    [self commandReply:command withBool:true];
+    // Check command.arguments here.
+    [self.commandDelegate runInBackground:^{
+        [self.commandDelegate evalJs:@"window.kuyashop = {}"];
+        
+        [self export:@"payment_states" object:[[NSDictionary alloc] initWithObjectsAndKeys:
+                                               @(SKPaymentTransactionStatePurchasing), @"purchasing",
+                                               @(SKPaymentTransactionStatePurchased), @"purchased",
+                                               @(SKPaymentTransactionStateFailed), @"failed",
+                                               @(SKPaymentTransactionStateRestored), @"restored",
+                                               @(SKPaymentTransactionStateDeferred), @"deferred",
+                                               nil
+                                               ]];
+        
+        [self export:@"errors" object:[[NSDictionary alloc] initWithObjectsAndKeys:
+                                       @(SKErrorClientInvalid), @"client_invalid",
+                                       @(SKErrorPaymentCancelled), @"payment_cancelled",
+                                       @(SKErrorPaymentInvalid), @"payment_invalid",
+                                       @(SKErrorPaymentNotAllowed), @"payment_not_allowed",
+                                       @(SKErrorStoreProductNotAvailable), @"store_product_not_available",
+                                       nil
+                                       ]];
+        
+        
+        [[SKPaymentQueue defaultQueue] addTransactionObserver:self];
+        
+        [self commandReply:command withBool:true];
+    }];
 }
 
 -(void) export:(NSString*)name object:(NSDictionary*) obj
@@ -241,71 +244,76 @@ static IOSStoreKit * _scManager;
 
 
 - (void) receipt: (CDVInvokedUrlCommand*)command {
-    NSData *receiptData = [self readAppStoreReceipt];
-    
-    if (receiptData != nil) {
-        [self receiptDone:command data:receiptData];
-    } else {
-     
-        NSLog(@"receipt() refreshing receipts because none found");
-        self.refreshRequest = [[SKReceiptRefreshRequest alloc] init];
+    [self.commandDelegate runInBackground:^{
+        NSData *receiptData = [self readAppStoreReceipt];
         
-        ProductsRefreshDelegate *delegate = [[ProductsRefreshDelegate alloc] init];
-        delegate.plugin = self;
-        delegate.command = command;
+        if (receiptData != nil) {
+            [self receiptDone:command data:receiptData];
+        } else {
+         
+            NSLog(@"receipt() refreshing receipts because none found");
+            self.refreshRequest = [[SKReceiptRefreshRequest alloc] init];
+            
+            ProductsRefreshDelegate *delegate = [[ProductsRefreshDelegate alloc] init];
+            delegate.plugin = self;
+            delegate.command = command;
+            
+            [self.delegates addObject: delegate];
+            NSLog(@"delegates len %lu", (unsigned long)self.delegates.count);
         
-        [self.delegates addObject: delegate];
-        NSLog(@"delegates len %lu", (unsigned long)self.delegates.count);
-    
-        self.refreshRequest.delegate = delegate;
-        
-        [self.refreshRequest start];
-        NSLog(@"done request refresh");
-    }
+            self.refreshRequest.delegate = delegate;
+            
+            [self.refreshRequest start];
+            NSLog(@"done request refresh");
+        }
+    }];
 }
 
 
 -(void) product:(CDVInvokedUrlCommand*)command
 {
-    
-    NSString* prodId  = [command.arguments objectAtIndex:0];
-    
-    NSSet* pid = [NSSet setWithObject:prodId ];
-    
-    NSLog(@"Start: %@ %@" , @"getProduct",prodId);
-    
-    ProductsRequestDelegate* delegate = [[ProductsRequestDelegate alloc] init];
-    delegate.plugin = self;
-    delegate.command = command;
-    [self.delegates addObject:delegate];
-    
-    self.request = [[SKProductsRequest alloc] initWithProductIdentifiers:pid];
-    self.request.delegate = delegate;
-    [self.request start];
-    
-    NSLog(@"End: %@" , @"getProduct");
+    [self.commandDelegate runInBackground:^{
+        NSString* prodId  = [command.arguments objectAtIndex:0];
+        
+        NSSet* pid = [NSSet setWithObject:prodId ];
+        
+        NSLog(@"Start: %@ %@" , @"getProduct",prodId);
+        
+        ProductsRequestDelegate* delegate = [[ProductsRequestDelegate alloc] init];
+        delegate.plugin = self;
+        delegate.command = command;
+        [self.delegates addObject:delegate];
+        
+        self.request = [[SKProductsRequest alloc] initWithProductIdentifiers:pid];
+        self.request.delegate = delegate;
+        [self.request start];
+        
+        NSLog(@"End: %@" , @"getProduct");
+    }];
 }
 
 
 -(void) purchase:(CDVInvokedUrlCommand*)command
 {
-    if( ![SKPaymentQueue canMakePayments] ) {
-        [self commandReply:command withError:@"nopayments"];
-        return;
-    }
-    
-    NSString* ident = [command.arguments objectAtIndex:0];
-    SKProduct* product = [self.allProducts objectForKey:ident];
-    
-    if( !product ) {
-        NSLog(@"keys %@", [self.allProducts allKeys]);
-        NSLog(@"Didnt find product in subscribe() for %@", ident);
-        [self commandReply:command withError:@"no such product"];
-    } else {
-        NSLog(@"Found product - purchasing %@", ident);
-        SKPayment *payment = [SKPayment paymentWithProduct:product];
-        [[SKPaymentQueue defaultQueue] addPayment:payment];
-    }
+    [self.commandDelegate runInBackground:^{
+        if( ![SKPaymentQueue canMakePayments] ) {
+            [self commandReply:command withError:@"nopayments"];
+            return;
+        }
+        
+        NSString* ident = [command.arguments objectAtIndex:0];
+        SKProduct* product = [self.allProducts objectForKey:ident];
+        
+        if( !product ) {
+            NSLog(@"keys %@", [self.allProducts allKeys]);
+            NSLog(@"Didnt find product in subscribe() for %@", ident);
+            [self commandReply:command withError:@"no such product"];
+        } else {
+            NSLog(@"Found product - purchasing %@", ident);
+            SKPayment *payment = [SKPayment paymentWithProduct:product];
+            [[SKPaymentQueue defaultQueue] addPayment:payment];
+        }
+    }];
 }
 
 -(NSMutableDictionary*) serializeTransaction: (SKPaymentTransaction*)transaction
