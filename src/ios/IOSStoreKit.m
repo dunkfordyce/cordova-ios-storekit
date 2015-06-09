@@ -21,11 +21,15 @@
         NSLog(@"Product id: %@" , product.productIdentifier);
         
         [self.plugin.allProducts setObject:product forKey:product.productIdentifier];
-        
+
+        NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
+        [numberFormatter setFormatterBehavior:NSNumberFormatterBehavior10_4];
+        [numberFormatter setNumberStyle:NSNumberFormatterCurrencyStyle];
+        [numberFormatter setLocale:product.priceLocale];
         
         NSDictionary *jsonObj = [ [NSDictionary alloc] initWithObjectsAndKeys:
                                  product.localizedTitle, @"title",
-                                 product.price, @"price",
+                                 [numberFormatter stringFromNumber:product.price], @"price",
                                  product.productIdentifier, @"id",
                                  nil
                                  ];
