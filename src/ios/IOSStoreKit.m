@@ -50,7 +50,8 @@
 
 - (void)request:(SKRequest *)request didFailWithError:(NSError *)error NS_AVAILABLE_IOS(3_0);
 {
-     NSLog(@"---reqdidfail %lu", (long)error.code);
+    NSLog(@"---reqdidfail %lu", (long)error.code);
+    [self.plugin commandReply:self.command withError:@"requestfailed"];
     [self.plugin.delegates removeObject:self];
 }
 
