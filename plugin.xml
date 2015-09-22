@@ -13,6 +13,37 @@
 	<license>MIT</license>
     <keywords>cordova,purchase,storekit,ios</keywords>
 
+    <platform name="android">
+        <config-file target="config.xml" parent="/*">
+            <feature name="kuyashop">
+                <param name="android-package" value="com.kuya.cordova.plugin.KuyaShop" />
+            </feature>
+        </config-file>
+
+        <!--
+        <source-file src="res/values/billing_key_param.xml" target-dir="res/values/" />
+        <config-file target="res/values/billing_key_param.xml" parent="/*">
+            <string name="billing_key_param">$BILLING_KEY</string>
+        </config-file>
+        -->
+
+        <config-file target="AndroidManifest.xml" parent="/manifest">
+            <uses-permission android:name="com.android.vending.BILLING" />
+        </config-file>
+        <source-file src="src/android/com/kuya/cordova/plugin/KuyaShop.java" target-dir="src/com/kuya/cordova/plugin/" />
+        <source-file src="src/android/com/kuya/cordova/plugin/util/Base64.java" target-dir="src/com/kuya/cordova/plugin/util/" />
+        <source-file src="src/android/com/kuya/cordova/plugin/util/IabException.java" target-dir="src/com/kuya/cordova/plugin/util/" />
+        <source-file src="src/android/com/kuya/cordova/plugin/util/IabResult.java" target-dir="src/com/kuya/cordova/plugin/util/" />
+        <source-file src="src/android/com/kuya/cordova/plugin/util/Purchase.java" target-dir="src/com/kuya/cordova/plugin/util/" />
+        <source-file src="src/android/com/kuya/cordova/plugin/util/SkuDetails.java" target-dir="src/com/kuya/cordova/plugin/util/" />
+        <source-file src="src/android/com/kuya/cordova/plugin/util/Base64DecoderException.java" target-dir="src/com/kuya/cordova/plugin/util/" />
+        <source-file src="src/android/com/kuya/cordova/plugin/util/IabHelper.java" target-dir="src/com/kuya/cordova/plugin/util/" />
+        <source-file src="src/android/com/kuya/cordova/plugin/util/Inventory.java" target-dir="src/com/kuya/cordova/plugin/util/" />
+        <source-file src="src/android/com/kuya/cordova/plugin/util/Security.java" target-dir="src/com/kuya/cordova/plugin/util/" />
+
+        <source-file src="src/android/IInAppBillingService.aidl" target-dir="src/com/android/vending/billing" />
+    </platform>
+
     <platform name="ios">
         <!--
         <js-module src="www/store-ios.js" name="InAppPurchase">
